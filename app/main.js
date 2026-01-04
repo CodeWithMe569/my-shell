@@ -32,8 +32,6 @@ rl.on("line", async (line) => {
 		let fullPath;
 		for (let dir of dirs) {
 			fullPath = path.join(dir, command);
-			console.log(dir);
-			console.log(command);
 			try {
 				fs.accessSync(fullPath, fs.constants.X_OK);
 			} catch (e) {
