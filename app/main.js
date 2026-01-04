@@ -11,8 +11,12 @@ rl.prompt();
 
 rl.on('line', async (line) => {
 
-	if (line == "exit") {
+	if (line === "exit") {
 		process.exit(0);
+	} else if (line.substring(0,4) === "echo") {
+		process.stdout.write(line + "\n");
+		rl.prompt();
+		return;
 	}
 
 	process.stdout.write(line + ": command not found");
