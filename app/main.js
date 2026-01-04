@@ -2,8 +2,6 @@ const readline = require("readline");
 const fs = require("fs");
 const path = require('path');
 
-const { PATH } = process.env || "";
-
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
@@ -11,6 +9,19 @@ const rl = readline.createInterface({
 
 rl.setPrompt("$ ");
 rl.prompt("");
+
+function checkCommandPath(cmd, dirs) {
+	for (let dir of dirs) {
+		const fullPath = path.join(dir, cmd);
+		try {
+			fs.accessSync(fullPath, fs.constants.X_OK);
+			return fullPath;
+		} catch (e) {
+			continue;
+		}
+	}
+	return null;
+}
 
 
 rl.on("line", async (line) => {
@@ -23,22 +34,14 @@ rl.on("line", async (line) => {
 		return;
 	} else if (line.substring(0, 4) === "type") {
 		const command = line.substring(5);
-		const dirs = PATH.split(path.delimiter);
+		const pathEnv = process.env.PATH || "";
+		const dirs = pathEnv.split(path.delimiter);
 		if (["type", "echo", "exit"].includes(command)) {
 			console.log(`${command} is a shell builtin`);
 			rl.prompt();
 			return;
 		}
-		let fullPath;
-		for (let dir of dirs) {
-			fullPath = path.join(dir, command);
-			try {
-				fs.accessSync(fullPath, fs.constants.X_OK);
-			} catch (e) {
-				// do nothing
-				continue;
-			}
-		}
+		let fullPath = checkCommandPath(command, dirs);
 		if (fullPath) {
 			console.log(`${command} is ${fullPath}`);
 			rl.prompt();
