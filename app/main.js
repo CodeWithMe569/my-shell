@@ -1,4 +1,8 @@
 const readline = require('readline');
+const fs = require('fs');
+const path = require('path');
+
+const { PATH } = process.env || "";
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -8,26 +12,52 @@ const rl = readline.createInterface({
 rl.setPrompt("$ ");
 rl.prompt();
 
+function checkCommandPath(cmd, dirs) {
+
+	for (let dir of dirs) {
+		const fullPath = path.join(dir, cmd);
+		try {
+			fs.access(fullPath, fs.constants.X_OK, (e) => {
+				// do nothing
+			})
+			return fullPath;
+		} catch (e) {
+			// do nothing
+		}
+	}
+
+	return null;
+}
 
 rl.on('line', async (line) => {
 
 	if (line === "exit") {
 		process.exit(0);
-	} else if (line.substring(0,4) === "echo") {
-		process.stdout.write(line.substring(5) + "\n");
+	} else if (line.substring(0, 4) === "echo") {
+		console.log(line.substring(5));
 		rl.prompt();
 		return;
-	} else if (line.substring(0,4) === "type") {
+	} else if (line.substring(0, 4) === "type") {
 		command = line.substring(5);
-		if (command === "echo" || command === "exit" || command === "type") {
-			process.stdout.write(command + ": is a shell builtin\n");
-		} else {
-			process.stdout.write(command + ": not found");
+		const dirs = PATH.split(path.delimiter);
+		if (["type", "echo", "exit"].includes(command)) {
+			console.log(`${command}: is a shell builtin`);
+			rl.prompt();
+			return;
 		}
-		rl.prompt();
-		return;
+		const fullPath = checkCommandPath(command, dirs);
+		if (fullPath) {
+			console.log(`${command} is ${fullPath}`);
+			rl.prompt();
+			return;
+		}
+		else {
+			console.log(`${command}: not found`);
+			rl.prompt();
+			return;
+		}
 	}
 
-	process.stdout.write(line + ": command not found");
+	console.log(`${line}: command not found`);
 	rl.prompt();
 });
