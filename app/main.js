@@ -14,7 +14,7 @@ rl.on('line', async (line) => {
 	if (line === "exit") {
 		process.exit(0);
 	} else if (line.substring(0,4) === "echo") {
-		process.stdout.write(line + "\n");
+		process.stdout.write(line.substring(5) + "\n");
 		rl.prompt();
 		return;
 	} else if (line.substring(0,4) === "type") {
