@@ -17,7 +17,7 @@ rl.on('line', async (line) => {
 		process.stdout.write(line + "\n");
 		rl.prompt();
 		return;
-	} else if (line.substring(0,4) === "type" {
+	} else if (line.substring(0,4) === "type") {
 		command = line.substring(5);
 		if (command === "echo" || command === "exit" || command === "type") {
 			process.stdout.write(command + ": is a shell builtin\n");
