@@ -10,5 +10,6 @@ rl.prompt();
 
 
 rl.on('line', async (line) => {
+	process.stdout.write(line + ": command not found");
 	rl.prompt();
 });
